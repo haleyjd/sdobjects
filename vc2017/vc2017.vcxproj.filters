@@ -104,6 +104,18 @@
     <ClInclude Include="..\elib\win32\win32_platform.h">
       <Filter>Source Files\win32</Filter>
     </ClInclude>
+    <ClInclude Include="..\elib\hal\hal_opendir.h">
+      <Filter>Source Files\hal</Filter>
+    </ClInclude>
+    <ClInclude Include="..\elib\win32\win32_util.h">
+      <Filter>Source Files\win32</Filter>
+    </ClInclude>
+    <ClInclude Include="..\elib\win32\win32_opendir.h">
+      <Filter>Source Files\win32</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\sdobjects.h">
+      <Filter>Source Files\src</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\sdomain.cpp">
@@ -159,6 +171,18 @@
     </ClCompile>
     <ClCompile Include="..\elib\win32\win32_platform.cpp">
       <Filter>Source Files\win32</Filter>
+    </ClCompile>
+    <ClCompile Include="..\elib\hal\hal_opendir.cpp">
+      <Filter>Source Files\hal</Filter>
+    </ClCompile>
+    <ClCompile Include="..\elib\win32\win32_opendir.cpp">
+      <Filter>Source Files\win32</Filter>
+    </ClCompile>
+    <ClCompile Include="..\elib\win32\win32_util.cpp">
+      <Filter>Source Files\win32</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\sdobjects.cpp">
+      <Filter>Source Files\src</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

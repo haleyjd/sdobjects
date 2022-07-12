@@ -39,13 +39,17 @@
     <ClInclude Include="..\elib\hal\hal_init.h" />
     <ClInclude Include="..\elib\hal\hal_input.h" />
     <ClInclude Include="..\elib\hal\hal_ml.h" />
+    <ClInclude Include="..\elib\hal\hal_opendir.h" />
     <ClInclude Include="..\elib\hal\hal_platform.h" />
     <ClInclude Include="..\elib\hal\hal_sfx.h" />
     <ClInclude Include="..\elib\hal\hal_timer.h" />
     <ClInclude Include="..\elib\hal\hal_types.h" />
     <ClInclude Include="..\elib\hal\hal_video.h" />
+    <ClInclude Include="..\elib\win32\win32_opendir.h" />
     <ClInclude Include="..\elib\win32\win32_platform.h" />
+    <ClInclude Include="..\elib\win32\win32_util.h" />
     <ClInclude Include="..\src\econfig.h" />
+    <ClInclude Include="..\src\sdobjects.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\elib\elib\atexit.cpp" />
@@ -59,12 +63,16 @@
     <ClCompile Include="..\elib\hal\hal_init.cpp" />
     <ClCompile Include="..\elib\hal\hal_input.cpp" />
     <ClCompile Include="..\elib\hal\hal_ml.cpp" />
+    <ClCompile Include="..\elib\hal\hal_opendir.cpp" />
     <ClCompile Include="..\elib\hal\hal_platform.cpp" />
     <ClCompile Include="..\elib\hal\hal_sfx.cpp" />
     <ClCompile Include="..\elib\hal\hal_timer.cpp" />
     <ClCompile Include="..\elib\hal\hal_video.cpp" />
     <ClCompile Include="..\elib\win32\win32_main.cpp" />
+    <ClCompile Include="..\elib\win32\win32_opendir.cpp" />
     <ClCompile Include="..\elib\win32\win32_platform.cpp" />
+    <ClCompile Include="..\elib\win32\win32_util.cpp" />
+    <ClCompile Include="..\src\sdobjects.cpp" />
     <ClCompile Include="..\src\sdomain.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
