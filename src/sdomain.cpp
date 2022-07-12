@@ -27,6 +27,7 @@
 */
 
 #include "elib/elib.h"
+#include "sdobjects.h"
 
 void sdobjects_main()
 {
