@@ -34,7 +34,38 @@
 #include "hal/hal_opendir.h"
 #include "sdobjects.h"
 
-static bool printresults;
+static bool    printresults;
+static bool    doOutput;
+static qstring outputpath;
+static int     filenum;
+
+//
+// Construct output filename for THINGS lumps
+//
+static qstring GetOutputFilename(const char *inputpath)
+{
+    qstring outfn;
+
+    // output THINGS.xy for input file with extension .xy
+    const qstring inpstr { inputpath };
+    if(const size_t inplen = inpstr.length(); inplen >= 3)
+    {
+        if(inpstr[inplen - 3] == '.')
+        {
+            if(ectype::isDigit(inpstr[inplen - 2]) && ectype::isDigit(inpstr[inplen - 1]))
+                outfn = "THINGS" + qstring(&inpstr[inplen - 3]);
+        }
+    }
+
+    // otherwise, use a monotonically increasing output number
+    if(outfn.empty())
+    {
+        outfn = "THINGS." + qstring::ToString(filenum);
+        ++filenum;
+    }
+
+    return outputpath / outfn;
+}
 
 //
 // Process a single file
@@ -48,6 +79,12 @@ static void ProcessFile(const char *inputpath)
         const RLObjects objects = ReadRLObjects(pdata, len);
         if(printresults)
             PrintRLObjects(objects);
+        if(doOutput)
+        {
+            const qstring outname { GetOutputFilename(inputpath) };
+            if(WriteTHINGS(objects, outname.c_str()) == false)
+                std::fprintf(stderr, "Failed to write output file '%s'\n", outname.c_str());
+        }
     }
     else
         std::fprintf(stderr, "Could not open file '%s' for input\n", inputpath);
@@ -91,7 +128,18 @@ void sdobjects_main()
     if(args.findArgument("-print"))
         printresults = true;
     else
-        std::printf("sdobjects - SNES Doom objects converter program\n");
+        std::printf("sdobjects - SNES Doom objects converter program\n\n");
+
+    if(const int outidx = args.getArgParameters("-out", 1); outidx != 0)
+    {
+        doOutput   = true;
+        outputpath = argv[outidx];
+        if(hal_platform.makeDirectory(outputpath.c_str()) == HAL_FALSE)
+        {
+            std::fprintf(stderr, "Could not create output directory '%s'\n", outputpath.c_str());
+            doOutput = false;
+        }
+    }
 
     // process individual files
     int p = 1;

@@ -278,4 +278,41 @@ void PrintRLObjects(const RLObjects &objects)
     );
 }
 
+//
+// Write RLObjects data as a Doom THINGS lump
+//
+bool WriteTHINGS(const RLObjects &objects, const char *filename)
+{
+    EAutoFile ufp { std::fopen(filename, "wb") };
+    std::FILE *const fp = ufp.get();
+    if(fp == nullptr)
+        return false;
+
+    for(const RLObject &obj : objects)
+    {
+        DoomMapThing mt;
+
+        if(obj.type >= ToIndex(ObjDataNums::MAX))
+            continue;
+
+        mt.x     = obj.x;
+        mt.y     = obj.y;
+        mt.angle = DoomAngleFromRLAngle(obj.angle);
+        mt.type  = doomednums[obj.type];
+        mt.flags = obj.flags & (MTF_EASY|MTF_MEDIUM|MTF_HARD|MTF_MULTI); // values are all equal
+
+        size_t written = 0;
+        written += std::fwrite(&mt.x,     sizeof(mt.x),     1, fp);
+        written += std::fwrite(&mt.y,     sizeof(mt.y),     1, fp);
+        written += std::fwrite(&mt.angle, sizeof(mt.angle), 1, fp);
+        written += std::fwrite(&mt.type,  sizeof(mt.type),  1, fp);
+        written += std::fwrite(&mt.flags, sizeof(mt.flags), 1, fp);
+
+        if(written != 5)
+            return false;
+    }
+
+    return true;
+}
+
 // EOF

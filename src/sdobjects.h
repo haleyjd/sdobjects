@@ -30,6 +30,26 @@
 
 #include <vector>
 
+// Doom's mapthing_t structure
+struct DoomMapThing
+{
+    int16_t x;
+    int16_t y;
+    int16_t angle;
+    int16_t type;
+    int16_t flags;
+};
+
+// Doom MTF flags
+enum DoomMTFlags : int16_t
+{
+    MTF_EASY   = 0x01,
+    MTF_MEDIUM = 0x02,
+    MTF_HARD   = 0x04,
+    MTF_AMBUSH = 0x08,
+    MTF_MULTI  = 0x10
+};
+
 // RLObject stores the data read from an OBJECTS lump.
 struct RLObject
 {
@@ -146,5 +166,8 @@ RLObjects ReadRLObjects(const ebyte *pdata, size_t len);
 
 // Print information about RLObjects
 void PrintRLObjects(const RLObjects &objects);
+
+// Write RLObjects data as a Doom THINGS lump
+bool WriteTHINGS(const RLObjects &objects, const char *filename);
 
 // EOF
