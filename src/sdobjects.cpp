@@ -27,6 +27,8 @@
 */
 
 #include "elib/elib.h"
+#include "elib/binary.h"
+#include "elib/qstring.h"
 #include "sdobjects.h"
 
 // Reverse translation table from ObjDataNums back to DoomEd numbers
@@ -97,5 +99,177 @@ const int16_t doomednums[ToIndex(ObjDataNums::MAX)] =
     48,   // ColumnTechTall,
     55    // FireStickShortBlue,
 };
+
+#define ENUMSTR(e) #e
+
+// Pretty printable names for each RLObject type
+static const char *const ObjNames[ToIndex(ObjDataNums::MAX)] =
+{
+    ENUMSTR(Player1Start),
+    ENUMSTR(Player2Start),
+    ENUMSTR(Player3Start),
+    ENUMSTR(Player4Start),
+    ENUMSTR(DeathMatchStart),
+    ENUMSTR(TeleportSpot),
+    ENUMSTR(Soldier),
+    ENUMSTR(Sergeant),
+    ENUMSTR(Trooper),
+    ENUMSTR(Demon),
+    ENUMSTR(CacoDemon),
+    ENUMSTR(LostSoul),
+    ENUMSTR(BaronOfHell),
+    ENUMSTR(CyberDemon),
+    ENUMSTR(SpiderDemon),
+    ENUMSTR(ShotGun),
+    ENUMSTR(ChainSaw),
+    ENUMSTR(ChainGun),
+    ENUMSTR(RocketLauncher),
+    ENUMSTR(PlasmaGun),
+    ENUMSTR(BFG9000),
+    ENUMSTR(RedKeyCard),
+    ENUMSTR(BlueKeyCard),
+    ENUMSTR(YellowKeyCard),
+    ENUMSTR(RedSkullKey),
+    ENUMSTR(YellowSkullKey),
+    ENUMSTR(BlueSkullKey),
+    ENUMSTR(BackPack),
+    ENUMSTR(Clip),
+    ENUMSTR(AmmoBox),
+    ENUMSTR(Shells),
+    ENUMSTR(ShellsBox),
+    ENUMSTR(Rocket),
+    ENUMSTR(RocketBox),
+    ENUMSTR(Cell),
+    ENUMSTR(CellPack),
+    ENUMSTR(StimPak),
+    ENUMSTR(Medikit),
+    ENUMSTR(HealthBonus),
+    ENUMSTR(ArmorBonus),
+    ENUMSTR(ArmorGreen),
+    ENUMSTR(ArmorBlue),
+    ENUMSTR(SoulSphere),
+    ENUMSTR(Invulnerable),
+    ENUMSTR(Berserk),
+    ENUMSTR(Invisible),
+    ENUMSTR(RadiationSuit),
+    ENUMSTR(ComputerMap),
+    ENUMSTR(LightGoggles),
+    ENUMSTR(Barrel),
+    ENUMSTR(FloorLamp),
+    ENUMSTR(BloodyMess),
+    ENUMSTR(DeadTrooper),
+    ENUMSTR(DeadDemon),
+    ENUMSTR(SkullOnPole),
+    ENUMSTR(PillarShortGreen),
+    ENUMSTR(Candle),
+    ENUMSTR(Candelabra),
+    ENUMSTR(FlamingSkullRock),
+    ENUMSTR(TreeGray),
+    ENUMSTR(FireStickTallRed),
+    ENUMSTR(ShrubBrown),
+    ENUMSTR(ColumnTechTall),
+    ENUMSTR(FireStickShortBlue)
+};
+
+constexpr size_t SMALLESTOBJLEN = 6;
+
+//
+// Read in RLObject structures from a binary file
+//
+RLObjects ReadRLObjects(const ebyte *pdata, size_t len)
+{
+    RLObjects objects;
+    const ebyte *rover = pdata;
+    size_t remaining = len;
+
+    while(remaining >= SMALLESTOBJLEN)
+    {
+        RLObject obj {};
+        
+        obj.flags = *rover++;
+        obj.type  = *rover++;
+        obj.x     = E_GetBinaryWord(&rover);
+        obj.y     = E_GetBinaryWord(&rover);
+
+        remaining -= SMALLESTOBJLEN;
+
+        if(RLObjectIsAngular(obj) && remaining >= 2)
+        {
+            obj.angle = E_GetBinaryUWord(&rover);
+            remaining -= 2;
+        }
+        else
+            obj.angle = 0;
+
+        objects.push_back(obj);
+    }
+
+    return objects;
+}
+
+//
+// Print information about RLObjects
+//
+void PrintRLObjects(const RLObjects &objects)
+{
+    static const struct flagdata_t
+    {
+        uint8_t flag;
+        const char *name;
+    } flagdata[] =
+    {
+        { rlpfSkill12,     "EASY"    },
+        { rlpfSkill3,      "MEDIUM"  },
+        { rlpfSkill45,     "HARD"    },
+        { rlpfMultiPlayer, "MULTI"   },
+        { rlpfMovable,     "MOVABLE" },
+        { rlpfActive,      "ACTIVE"  }
+    };
+
+    std::printf("\"objects\": [\n");
+
+    int num = 0;
+    for(const RLObject &obj : objects)
+    {
+        if(num != 0)
+            std::printf(",\n");
+
+        qstring flagstr;
+        if(obj.flags != 0)
+        {
+            for(const flagdata_t &fd : flagdata)
+            {
+                if(obj.flags & fd.flag)
+                {
+                    flagstr += fd.name;
+                    flagstr += "|";
+                }
+            }
+        }
+        if(flagstr.endsWith('|'))
+            flagstr.pop();
+        
+        const char *thingname = "Unknown";
+        if(obj.type >= 0 && obj.type < earrlen(ObjNames))
+            thingname = ObjNames[obj.type];
+
+        int16_t angle = 0;
+        if(RLObjectIsAngular(obj))
+            angle = DoomAngleFromRLAngle(obj.angle);
+
+        std::printf(
+            "  {\n"
+            "    \"num\":    %d,\n"
+            "    \"flags\":  \"%s\",\n"
+            "    \"type\":   \"%s\",\n"
+            "    \"coords\": [%hd, %hd],\n"
+            "    \"angle\":  %hd\n"
+            "  }",
+            num, flagstr.c_str(), thingname, obj.x, obj.y, angle
+        );
+        ++num;
+    }
+    std::printf("\n]\n");
+}
 
 // EOF

@@ -28,6 +28,8 @@
 
 #pragma once
 
+#include <vector>
+
 // RLObject stores the data read from an OBJECTS lump.
 struct RLObject
 {
@@ -113,6 +115,10 @@ constexpr std::underlying_type_t<ObjDataNums> ToIndex(ObjDataNums e) {
     return static_cast<std::underlying_type_t<ObjDataNums>>(e);
 }
 
+constexpr bool RLObjectIsAngular(const RLObject &obj) {
+    return obj.type <= ToIndex(ObjDataNums::LASTANGULAR);
+}
+
 // Reverse translation table from ObjDataNums back to DoomEd numbers
 extern const int16_t doomednums[ToIndex(ObjDataNums::MAX)];
 
@@ -131,5 +137,14 @@ enum RLObjectFlags : uint8_t
 constexpr int16_t DoomAngleFromRLAngle(uint16_t rlangle) {
     return int16_t(euint(rlangle) * 360 / 0x10000);
 }
+
+// Collection of RLObject structures
+using RLObjects = std::vector<RLObject>;
+
+// Read in RLObject structures from a binary file
+RLObjects ReadRLObjects(const ebyte *pdata, size_t len);
+
+// Print information about RLObjects
+void PrintRLObjects(const RLObjects &objects);
 
 // EOF
