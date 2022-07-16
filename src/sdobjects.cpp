@@ -226,7 +226,10 @@ void PrintRLObjects(const RLObjects &objects)
         { rlpfActive,      "ACTIVE"  }
     };
 
-    std::printf("\"objects\": [\n");
+    std::printf(
+        "{\n"
+        "  \"objects\": [\n"
+    );
 
     int num = 0;
     for(const RLObject &obj : objects)
@@ -250,7 +253,7 @@ void PrintRLObjects(const RLObjects &objects)
             flagstr.pop();
         
         const char *thingname = "Unknown";
-        if(obj.type >= 0 && obj.type < earrlen(ObjNames))
+        if(obj.type < earrlen(ObjNames))
             thingname = ObjNames[obj.type];
 
         int16_t angle = 0;
@@ -258,18 +261,21 @@ void PrintRLObjects(const RLObjects &objects)
             angle = DoomAngleFromRLAngle(obj.angle);
 
         std::printf(
-            "  {\n"
-            "    \"num\":    %d,\n"
-            "    \"flags\":  \"%s\",\n"
-            "    \"type\":   \"%s\",\n"
-            "    \"coords\": [%hd, %hd],\n"
-            "    \"angle\":  %hd\n"
-            "  }",
+            "    {\n"
+            "      \"num\":    %d,\n"
+            "      \"flags\":  \"%s\",\n"
+            "      \"type\":   \"%s\",\n"
+            "      \"coords\": [%hd, %hd],\n"
+            "      \"angle\":  %hd\n"
+            "    }",
             num, flagstr.c_str(), thingname, obj.x, obj.y, angle
         );
         ++num;
     }
-    std::printf("\n]\n");
+    std::printf(
+        "\n  ]\n"
+        "}\n"
+    );
 }
 
 // EOF

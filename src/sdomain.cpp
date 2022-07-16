@@ -41,17 +41,16 @@ static bool printresults;
 //
 static void ProcessFile(const char *inputpath)
 {
-    ebyte *pdata;
-    const size_t len = M_ReadFile(inputpath, &pdata);
-    if(pdata != nullptr && len > 0)
+    EUniquePtr<ebyte> updata;
+    const size_t len = M_ReadFileUnique(inputpath, updata);
+    if(ebyte *const pdata = updata.get(); pdata != nullptr && len > 0)
     {
-        const EUniquePtr<ebyte> updata { pdata };
         const RLObjects objects = ReadRLObjects(pdata, len);
         if(printresults)
             PrintRLObjects(objects);
     }
     else
-        std::printf("Could not open file '%s' for input\n", inputpath);
+        std::fprintf(stderr, "Could not open file '%s' for input\n", inputpath);
 }
 
 //
@@ -62,7 +61,7 @@ static void ProcessDirectory(const char *inputpath)
     hal_dir_t *const dir = hal_directory.openDir(inputpath);
     if(dir == nullptr)
     {
-        std::printf("Could not open directory '%s' for input\n", inputpath);
+        std::fprintf(stderr, "Could not open directory '%s' for input\n", inputpath);
         return;
     }
 
@@ -92,7 +91,7 @@ void sdobjects_main()
     if(args.findArgument("-print"))
         printresults = true;
     else
-        std::printf("sbobjects - SNES Doom objects converter program\n");
+        std::printf("sdobjects - SNES Doom objects converter program\n");
 
     // process individual files
     int p = 1;
